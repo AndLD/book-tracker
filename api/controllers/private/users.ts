@@ -1,10 +1,9 @@
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import { ObjectId } from 'mongodb'
 import { db } from '../../services/db'
 import { AuthorizedRequest } from '../../utils/types'
 import { usersService } from '../../services/users'
 import { logsService } from '../../services/logs'
-import { LogEntity } from '@lib/utils/interfaces/logs'
 
 const collectionName = 'users'
 
@@ -48,7 +47,7 @@ async function put(req: AuthorizedRequest, res: Response, next: NextFunction) {
         }
 
         logsService.addLog({
-            entity: LogEntity.USER,
+            entity: 'USER',
             action: 'UPDATE',
             createdAt: Date.now(),
             relativeId: null,

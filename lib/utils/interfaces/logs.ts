@@ -1,19 +1,18 @@
 import { ObjectId } from 'mongodb'
 
-export enum LogEntity {
-    USER = 'USER',
-    AUTHOR = 'AUTHOR',
-    GENRE = 'GENRE',
-    BOOK = 'BOOK',
-    BOOK_EDITION = 'BOOK_EDITION',
-    READING = 'READING',
-    BOOK_LIST = 'BOOK_LIST',
-    RECOMMENDER = 'RECOMMENDER',
-    VOCABULARY_ENTRY = 'VOCABULARY_ENTRY',
-    REVIEW = 'REVIEW',
-    RECOMMENDATION = 'RECOMMENDATION',
-    SETTINGS = 'SETTINGS'
-}
+export type LogEntity =
+    | 'USER'
+    | 'AUTHOR'
+    | 'GENRE'
+    | 'BOOK'
+    | 'BOOK_EDITION'
+    | 'READING'
+    | 'BOOK_LIST'
+    | 'RECOMMENDER'
+    | 'VOCABULARY_ENTRY'
+    | 'REVIEW'
+    | 'RECOMMENDATION'
+    | 'SETTINGS'
 export type LogAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'SIGNIN'
 
 export interface ILogBody {

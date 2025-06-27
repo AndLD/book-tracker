@@ -9,7 +9,6 @@ import { apiUtils } from '../../utils/api'
 import { errors } from '../../utils/constants'
 import { getLogger } from '../../utils/logger'
 import { logsService } from '../../services/logs'
-import { LogEntity } from '@lib/utils/interfaces/logs'
 
 const logger = getLogger('controllers/private/users')
 
@@ -38,7 +37,7 @@ async function postUser(req: any, res: Response) {
     }
 
     logsService.addLog({
-        entity: LogEntity.USER,
+        entity: 'USER',
         action: 'CREATE',
         createdAt: Date.now(),
         relativeId: null,
