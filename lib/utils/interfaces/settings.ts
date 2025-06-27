@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-export type SettingType = 'demo-clusters-list'
+export type SettingType = ''
 
 export interface ISettingBackend<T> extends ISettingBody<T> {
     _id: ObjectId

@@ -99,22 +99,6 @@ function UsersTable() {
         value: status
     }))
 
-    function renderClustersNodesCounter(_: any, row: IUserInfo) {
-        if (!row.clusters) {
-            return '0 / 0'
-        }
-
-        const totalNodes = row.clusters.reduce((accum: any, current: any) => {
-            return accum + current.totalNodes
-        }, 0)
-
-        return (
-            <div style={{ fontSize: 20 }}>
-                {row.clusters.length} / {totalNodes}
-            </div>
-        )
-    }
-
     const columns: ColumnsType<IUserInfo> = [
         {
             title: '#',
@@ -124,11 +108,6 @@ function UsersTable() {
         {
             title: 'ID',
             dataIndex: '_id'
-        },
-        {
-            title: 'Total C/N',
-            render: renderClustersNodesCounter,
-            align: 'center'
         },
         { title: 'Name', dataIndex: 'name' },
         {

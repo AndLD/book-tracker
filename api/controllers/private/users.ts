@@ -4,6 +4,7 @@ import { db } from '../../services/db'
 import { AuthorizedRequest } from '../../utils/types'
 import { usersService } from '../../services/users'
 import { logsService } from '../../services/logs'
+import { LogEntity } from '@lib/utils/interfaces/logs'
 
 const collectionName = 'users'
 
@@ -17,7 +18,7 @@ async function get(req: AuthorizedRequest, res: Response, next: NextFunction) {
         const skip = (pagination.page - 1) * pagination.results
         const limit = pagination.results
 
-        const users = await usersService.getUsersWithTotalNodesPerCluster(clientFilter, skip, limit)
+        const users = await usersService.getUsers(clientFilter, skip, limit)
 
         const total = await db.collection(collectionName).countDocuments(clientFilter)
 
@@ -47,10 +48,10 @@ async function put(req: AuthorizedRequest, res: Response, next: NextFunction) {
         }
 
         logsService.addLog({
-            entity: 'USERS',
+            entity: LogEntity.USER,
             action: 'UPDATE',
             createdAt: Date.now(),
-            clusterId: null,
+            relativeId: null,
             targetId: id,
             userId,
             payload: data

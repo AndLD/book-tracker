@@ -19,6 +19,7 @@ export type LogAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'SIGNIN'
 export interface ILogBody {
     entity: LogEntity
     action: LogAction
+    relativeId?: string | null
     targetId: string
     userId: string
     payload?: Record<string, any>

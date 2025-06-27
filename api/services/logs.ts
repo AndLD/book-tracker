@@ -45,7 +45,7 @@ function stopQueue() {
 function getLogs(options: {
     fromDate: number
     toDate: number
-    clusterId?: string
+    relativeId?: string
     logEntities: LogEntity[]
     action?: LogAction
 }) {
@@ -56,8 +56,8 @@ function getLogs(options: {
     if (options.action) {
         query.action = options.action
     }
-    if (options.clusterId) {
-        query.clusterId = options.clusterId
+    if (options.relativeId) {
+        query.relativeId = options.relativeId
     }
 
     return db.collection<ILogBackend>(collection).find(query).sort({ createdAt: 1 }).toArray()

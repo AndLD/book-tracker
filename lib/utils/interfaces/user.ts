@@ -45,8 +45,6 @@ export interface IUserInfo {
     updatedAt?: number
     keywords?: string[]
     user?: string
-
-    clusters?: { _id: string; title: string; totalNodes: number }[]
 }
 
 export interface IUserPost {

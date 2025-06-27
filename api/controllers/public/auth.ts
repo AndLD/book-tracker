@@ -10,6 +10,7 @@ import { createJwt, refreshJwtSecret } from '../../utils/jwt'
 import { apiUtils } from '../../utils/api'
 import { Document, ObjectId, WithId } from 'mongodb'
 import { logsService } from '../../services/logs'
+import { LogEntity } from '@lib/utils/interfaces/logs'
 
 interface IRefreshJwtPayload extends jwt.JwtPayload {
     user: {
@@ -46,10 +47,10 @@ async function postLogin(req: any, res: Response) {
     }
 
     logsService.addLog({
-        entity: 'USERS',
+        entity: LogEntity.USER,
         action: 'SIGNIN',
         createdAt: Date.now(),
-        clusterId: null,
+        relativeId: null,
         targetId: userState._id,
         userId: userState._id,
         payload: userState
