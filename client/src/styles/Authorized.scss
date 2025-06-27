@@ -1,0 +1,124 @@
+/* Define keyframes for the animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Apply the animation to the screen container */
+.screen-container {
+    position: relative;
+    animation: fadeIn 1s ease-in-out; /* You can adjust the duration and easing function as needed */
+
+    .controls {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        font-size: 20px;
+        text-align: center;
+
+        width: 110px;
+
+        .buttons-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 10px 10px;
+        }
+        .my-progress {
+            margin-top: 10;
+        }
+    }
+
+    @media (max-width: 414px) {
+        .controls {
+            top: auto;
+            left: 50%;
+            bottom: 20px;
+
+            width: 165px;
+
+            .buttons-wrapper {
+                margin: 0;
+            }
+        }
+
+        .my-progress {
+            position: absolute;
+            margin-top: 10;
+            top: 50px;
+            right: 30px;
+        }
+    }
+}
+
+.select-category-container {
+    height: 325px;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.select-category-container::-webkit-scrollbar {
+    width: 7px !important;
+}
+
+.select-category-container::-webkit-scrollbar-thumb {
+    background-color: rgba(189, 189, 189, 0.38) !important; /* Change color as needed */
+    border-radius: 6px !important;
+}
+
+.select-category-container::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.19); /* Change color as needed */
+}
+
+.confirm-buttons-wrapper {
+    position: absolute;
+    bottom: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+
+    .confirm-buttons-title {
+        user-select: none;
+        text-align: center;
+        padding: 15px 0;
+        font-size: 30px;
+        color: #00b300;
+    }
+
+    .confirm-buttons {
+        display: flex;
+        width: max-content;
+        margin: auto;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+
+        .confirm-button {
+            padding: 15px;
+            cursor: pointer;
+            background: transparent;
+            transition: all ease 0.3s;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .confirm-button:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+    }
+
+    @media (max-width: 414px) {
+        & {
+            bottom: 130px;
+            pointer-events: none;
+        }
+
+        .confirm-buttons {
+            pointer-events: all;
+        }
+    }
+}
