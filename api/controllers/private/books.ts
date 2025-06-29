@@ -9,8 +9,8 @@ import { apiUtils } from '../../utils/api'
 async function addBook(req: Request, res: Response) {
     const { book, edition }: { book: IBook; edition: IBookEdition } = req.body
     const newBook = await booksService.createBook(book)
-    await editionsService.createEdition(edition, newBook._id)
-    apiUtils.sendResult(res, newBook)
+    const newEdition = await editionsService.createEdition(edition, newBook._id)
+    apiUtils.sendResult(res, { book: newBook, edition: newEdition })
 }
 
 export const booksControllers = {

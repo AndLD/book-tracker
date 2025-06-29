@@ -54,6 +54,8 @@ export default function DashboardPage() {
     const [addAuthorForm] = Form.useForm()
     const [addGenreForm] = Form.useForm()
 
+    const authorIds: string[] = Form.useWatch('authorIds', addBookForm) || []
+    const genreIds: string[] = Form.useWatch('genreIds', addBookForm)
     const editionType = Form.useWatch('type', addBookForm)
     const editionLanguage = Form.useWatch('language', addBookForm)
     const originalLanguage = Form.useWatch('originalLn', addBookForm)
@@ -141,12 +143,10 @@ export default function DashboardPage() {
                     setIsAddAuthorModalVisible(false)
                     addAuthorForm.resetFields()
 
-                    setTimeout(() => {
-                        const currentAuthorIds = addBookForm.getFieldValue('authorIds') || []
-                        addBookForm.setFieldsValue({
-                            authorIds: [...currentAuthorIds, newAuthor._id]
-                        })
-                    }, 0)
+                    const currentAuthorIds = addBookForm.getFieldValue('authorIds') || []
+                    addBookForm.setFieldsValue({
+                        authorIds: [...currentAuthorIds, newAuthor._id]
+                    })
                 } catch (error) {
                     message.error('Failed to add author.')
                     console.error('Failed to add author:', error)
@@ -176,12 +176,10 @@ export default function DashboardPage() {
                     setIsAddGenreModalVisible(false)
                     addGenreForm.resetFields()
 
-                    setTimeout(() => {
-                        const currentGenreIds = addBookForm.getFieldValue('genreIds') || []
-                        addBookForm.setFieldsValue({
-                            genreIds: [...currentGenreIds, newGenre._id]
-                        })
-                    }, 0)
+                    const currentGenreIds = addBookForm.getFieldValue('genreIds') || []
+                    addBookForm.setFieldsValue({
+                        genreIds: [...currentGenreIds, newGenre._id]
+                    })
                 } catch (error) {
                     message.error('Failed to add genre.')
                     console.error('Failed to add genre:', error)
@@ -255,6 +253,8 @@ export default function DashboardPage() {
                                 placeholder="Select authors"
                                 loading={isAuthorsLoading}
                                 options={authors?.result?.map((author) => ({ value: author._id, label: author.name }))}
+                                value={authorIds}
+                                onChange={(value) => addBookForm.setFieldsValue({ authorIds: value })}
                             />
                             <Button onClick={showAddAuthorModal} icon={<PlusOutlined />} />
                         </Space.Compact>
@@ -272,6 +272,8 @@ export default function DashboardPage() {
                                 placeholder="Select genres"
                                 loading={isGenresLoading}
                                 options={genres?.result?.map((genre) => ({ value: genre._id, label: genre.name }))}
+                                value={genreIds}
+                                onChange={(value) => addBookForm.setFieldsValue({ genreIds: value })}
                             />
                             <Button onClick={showAddGenreModal} icon={<PlusOutlined />} />
                         </Space.Compact>
