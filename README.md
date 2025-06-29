@@ -14,32 +14,32 @@ This project aims to solve these problems by providing a dedicated platform for 
 
 ## Core Features
 
-*   **Comprehensive Reading Lists:**
-    *   Track books you have read, are currently reading, and plan to read.
-    *   Log multiple readings for the same book, including start/end dates and listening time for audiobooks.
-    *   Manage categorized reading plans (by author, genre) and priority lists.
-    *   Keep a separate list for books recommended by others.
-    *   Maintain a wishlist for paper books.
-*   **Detailed Statistics & Insights:**
-    *   Get counts of books in every list (e.g., per author, per genre).
-    *   View and filter book lists by author, genre, or a combination of both.
-    *   Analyze your reading history across different time scales: per month, per year, or custom date ranges.
-    *   Visualize all statistical data with charts.
-*   **Vocabulary Builder:**
-    *   Keep a personal vocabulary list of new words you encounter.
+- **Comprehensive Reading Lists:**
+    - Track books you have read, are currently reading, and plan to read.
+    - Log multiple readings for the same book, including start/end dates and listening time for audiobooks.
+    - Manage categorized reading plans (by author, genre) and priority lists.
+    - Keep a separate list for books recommended by others.
+    - Maintain a wishlist for paper books.
+- **Detailed Statistics & Insights:**
+    - Get counts of books in every list (e.g., per author, per genre).
+    - View and filter book lists by author, genre, or a combination of both.
+    - Analyze your reading history across different time scales: per month, per year, or custom date ranges.
+    - Visualize all statistical data with charts.
+- **Vocabulary Builder:**
+    - Keep a personal vocabulary list of new words you encounter.
 
 ## Core Entities
 
 The application is modeled around the following core entities:
 
-*   **User & Auth:** `User`, `Auth`, `Settings`
-*   **Books & Content:** `Book`, `Author`, `Genre`, `BookEdition`
-*   **Tracking:** `Reading`, `Review`, `BookList`
-*   **Recommendations:** `Recommendation`, `Recommender`
-*   **Misc:** `Vocabulary`, `Statistics`, `Logs`
+- **User & Auth:** `User`, `Auth`, `Settings`
+- **Books & Content:** `Book`, `Author`, `Genre`, `BookEdition`
+- **Tracking:** `Reading`, `Review`, `BookList`
+- **Recommendations:** `Recommendation`, `Recommender`
+- **Misc:** `Vocabulary`, `Statistics`, `Logs`
 
 ## Tech Stack
 
-*   **Backend:** Node.js (Express)
-*   **Frontend:** React (Vite)
-*   **Database:** MongoDB
+- **Backend:** Node.js (Express)
+- **Frontend:** React (Vite)
+- **Database:** MongoDB

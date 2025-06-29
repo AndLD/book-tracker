@@ -7,5 +7,5 @@ export const KEYBOARD = {
     CTRL_KEY: isMacOS ? 'metaKey' : 'ctrlKey',
     SHIFT_KEY: 'shiftKey'
 }
-export const appName = 'App Boilerplate'
+export const appName = 'Book Tracker'
 export const appShortName = 'AB'

@@ -3,7 +3,7 @@ import { useDashboardContextValue } from '../hooks/pages/dashboard'
 import { useTitle } from '../hooks/pages/layout'
 import { dashboardContext } from '../context'
 
-export default function Dashboard() {
+export default function AdminDashboard() {
     useTitle('Dashboard')
 
     return (

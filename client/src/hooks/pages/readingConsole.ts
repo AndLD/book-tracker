@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function useAuthorizedContextValue() {
+export default function useReadingConsoleContextValue() {
     const editModeState = useState<boolean>(false)
 
     return {

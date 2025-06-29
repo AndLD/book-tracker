@@ -1,2 +1,2 @@
-export const appName = 'App Boilerplate'
+export const appName = 'Book Tracker'
 export const appShortName = 'AB'
