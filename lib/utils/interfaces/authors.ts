@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb'
 export interface IAuthor {
     _id: string
     name: string
+    englishName?: string
+    nativeLn?: string
     bio?: string
     birthDate?: number
     deathDate?: number

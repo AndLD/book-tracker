@@ -1,6 +1,3 @@
-import dayjs from 'dayjs'
-import { INode, INodePosition } from '@lib/utils/interfaces/nodes.ts'
-import { ICategory } from '@lib/utils/interfaces/categories.ts'
 import { isProduction } from './constants'
 
 export const Utils = {
@@ -8,62 +5,6 @@ export const Utils = {
         // получить случайное число от (min-0.5) до (max+0.5)
         const rand = min - 0.5 + Math.random() * (max - min + 1)
         return Math.round(rand)
-    },
-    // @ts-ignore
-    getNodeLabel(node: INode, category?: ICategory) {
-        if (!node.payload) {
-            return null
-        }
-
-        // TODO Andrii Larionov: Remove
-        // const titleKey = category?.fields?.find(
-        //     (field) => field.type === 'title'
-        // )?.name
-
-        let title = node.payload.title
-
-        if (title.length > 20) {
-            title = title
-                .split(' ')
-                .map((word, i) => {
-                    if (i % 3 === 0 && i > 0) {
-                        return word + '\n'
-                    }
-
-                    return word
-                })
-                .join(' ')
-        }
-
-        return (
-            node.payload.title +
-            (node.payload.startDate
-                ? '\n' +
-                  dayjs(node.payload.startDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString() +
-                  (node.payload.endDate
-                      ? ' - ' + dayjs(node.payload.endDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString()
-                      : '')
-                : '')
-        )
-    },
-    getNodeLabelJsx(node: INode) {
-        if (!node.payload) {
-            return null
-        }
-
-        return (
-            <>
-                <div>{node.payload.title}</div>
-                {node.payload.startDate && (
-                    <div className="dates">
-                        {dayjs(node.payload.startDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString() +
-                            (node.payload.endDate
-                                ? ' - ' + dayjs(node.payload.endDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString()
-                                : '')}
-                    </div>
-                )}
-            </>
-        )
     },
     renameIdKeyForItems(items: any[]) {
         return items.map(({ _id, ...rest }) => ({
@@ -91,18 +32,6 @@ export const Utils = {
         ]
 
         return colors[Utils.randomInteger(0, colors.length)]
-    },
-    mapNodesToNodesPositionsObj(nodes: INode[]): { [id: string]: INodePosition } {
-        return nodes.reduce((acc, curr) => {
-            acc[curr.id] = { x: curr.x, y: curr.y }
-            return acc
-        }, {})
-    },
-    mapNodesObjToNodesPositionsObj(nodesObj: { [id: string]: INode }): { [id: string]: INodePosition } {
-        return Object.keys(nodesObj).reduce((acc, curr) => {
-            acc[nodesObj[curr].id] = { x: nodesObj[curr].x, y: nodesObj[curr].y }
-            return acc
-        }, {})
     },
     // Helper function to chunk an array into smaller arrays of a specified size
     chunkArray<T>(array: T[], size: number): T[][] {

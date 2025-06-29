@@ -38,7 +38,7 @@ export default function AdminMenu() {
             )}
 
             <Menu.Item key="/chat" icon={<HomeOutlined style={style} />}>
-                <a href={'/authorized'}>Authorized</a>
+                <a href={'/reading-console'}>Reading Console</a>
             </Menu.Item>
         </Menu>
     )

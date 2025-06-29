@@ -6,6 +6,9 @@ import { setReqEntity } from '../middlewares/decorators'
 import { entities } from '../utils/constants'
 import { statisticsPrivateRouter } from '../routers/private/statistics'
 import { usersPrivateRouter } from '../routers/private/users'
+import booksPrivateRouter from '../routers/private/books'
+import authorsPrivateRouter from '../routers/private/authors'
+import genresPrivateRouter from '../routers/private/genres'
 import usersPublicRouter from '../routers/public/users'
 
 export function setupRouters(app: Express) {
@@ -26,4 +29,7 @@ export function setupRouters(app: Express) {
     privateRouter.use('/auth', authPrivateRouter)
     privateRouter.use('/users', usersPrivateRouter)
     privateRouter.use('/statistics', statisticsPrivateRouter)
+    privateRouter.use('/books', booksPrivateRouter)
+    privateRouter.use('/authors', authorsPrivateRouter)
+    privateRouter.use('/genres', genresPrivateRouter)
 }
