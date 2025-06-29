@@ -6,6 +6,11 @@ export interface IAuthor {
     bio?: string
     birthDate?: number
     deathDate?: number
+    imageUrl?: string
+    altEmoji?: string
+    colorPalette: string[]
+    rating: number
+    disableRating: boolean
 }
 
 export interface IAuthorBackend extends Omit<IAuthor, '_id'> {

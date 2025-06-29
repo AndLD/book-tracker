@@ -7,6 +7,10 @@ export interface IBook {
     genreIds: string[]
     rating: number
     disableRating: boolean
+    originalTitle?: string
+    originalLn?: string
+    firstPublishedYear?: number
+    description?: string
 }
 
 export interface IBookBackend extends Omit<IBook, '_id' | 'authorIds' | 'genreIds'> {

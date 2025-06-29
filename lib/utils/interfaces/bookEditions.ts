@@ -13,6 +13,8 @@ export interface IBookEdition {
     publisher?: string
     year?: number
     language?: string
+    // TODO: Turn translators into translatorIds???
+    translators?: string[]
     isbn?: string
     imageUrl?: string
     altEmoji?: string
