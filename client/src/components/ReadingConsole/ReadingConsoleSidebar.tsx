@@ -26,6 +26,22 @@ interface ReadingConsoleSidebarProps {
     onMenuClick: (key: string) => void
 }
 
+const iconColors = [
+    '#FF6B6B',
+    '#4ECDC4',
+    '#45B7D1',
+    '#FED766',
+    '#247BA0',
+    '#F2E205',
+    '#F2B2A0',
+    '#F28C0F',
+    '#C1E0F2',
+    '#A2D9A2',
+    '#F2A0C1',
+    '#D9A2F2',
+    '#F2D0A2'
+];
+
 export default function ReadingConsoleSidebar({
     collapsed,
     onCollapse,
@@ -99,8 +115,8 @@ export default function ReadingConsoleSidebar({
                         label: 'Overview',
                         type: 'group',
                         children: [
-                            { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
-                            { key: '2', icon: <BarChartOutlined />, label: 'Analytics' }
+                            { key: '1', icon: <DashboardOutlined style={{ color: iconColors[0] }} />, label: 'Dashboard' },
+                            { key: '2', icon: <BarChartOutlined style={{ color: iconColors[1] }} />, label: 'Analytics' }
                         ]
                     },
                     {
@@ -108,9 +124,9 @@ export default function ReadingConsoleSidebar({
                         label: 'Reading Lists',
                         type: 'group',
                         children: [
-                            { key: '3', icon: <ReadOutlined />, label: 'Currently Reading' },
-                            { key: '4', icon: <CheckCircleOutlined />, label: 'Completed Books' },
-                            { key: '5', icon: <BookOutlined />, label: 'Reading Plan' }
+                            { key: '3', icon: <ReadOutlined style={{ color: iconColors[2] }} />, label: 'Currently Reading' },
+                            { key: '4', icon: <CheckCircleOutlined style={{ color: iconColors[3] }} />, label: 'Completed Books' },
+                            { key: '5', icon: <BookOutlined style={{ color: iconColors[4] }} />, label: 'Reading Plan' }
                         ]
                     },
                     {
@@ -118,11 +134,11 @@ export default function ReadingConsoleSidebar({
                         label: 'Organization',
                         type: 'group',
                         children: [
-                            { key: '6', icon: <UserOutlined />, label: 'By Authors' },
-                            { key: '7', icon: <TagsOutlined />, label: 'By Genres' },
-                            { key: '8', icon: <StarOutlined />, label: 'Recommendations' },
-                            { key: '9', icon: <ArrowUpOutlined />, label: 'High Priority' },
-                            { key: '10', icon: <ArrowDownOutlined />, label: 'Low Priority' }
+                            { key: '6', icon: <UserOutlined style={{ color: iconColors[5] }} />, label: 'By Authors' },
+                            { key: '7', icon: <TagsOutlined style={{ color: iconColors[6] }} />, label: 'By Genres' },
+                            { key: '8', icon: <StarOutlined style={{ color: iconColors[7] }} />, label: 'Recommendations' },
+                            { key: '9', icon: <ArrowUpOutlined style={{ color: iconColors[8] }} />, label: 'High Priority' },
+                            { key: '10', icon: <ArrowDownOutlined style={{ color: iconColors[9] }} />, label: 'Low Priority' }
                         ]
                     },
                     {
@@ -130,9 +146,9 @@ export default function ReadingConsoleSidebar({
                         label: 'Tools',
                         type: 'group',
                         children: [
-                            { key: '11', icon: <ShoppingCartOutlined />, label: 'Want to Buy' },
-                            { key: '12', icon: <BulbOutlined />, label: 'Vocabulary' },
-                            { key: '13', icon: <SettingOutlined />, label: 'Settings' }
+                            { key: '11', icon: <ShoppingCartOutlined style={{ color: iconColors[10] }} />, label: 'Want to Buy' },
+                            { key: '12', icon: <BulbOutlined style={{ color: iconColors[11] }} />, label: 'Vocabulary' },
+                            { key: '13', icon: <SettingOutlined style={{ color: iconColors[12] }} />, label: 'Settings' }
                         ]
                     }
                 ]}

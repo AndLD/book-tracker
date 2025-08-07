@@ -9,6 +9,7 @@ import { usersPrivateRouter } from '../routers/private/users'
 import booksPrivateRouter from '../routers/private/books'
 import authorsPrivateRouter from '../routers/private/authors'
 import genresPrivateRouter from '../routers/private/genres'
+import readersPrivateRouter from '../routers/private/readers'
 import usersPublicRouter from '../routers/public/users'
 
 export function setupRouters(app: Express) {
@@ -32,4 +33,5 @@ export function setupRouters(app: Express) {
     privateRouter.use('/books', booksPrivateRouter)
     privateRouter.use('/authors', authorsPrivateRouter)
     privateRouter.use('/genres', genresPrivateRouter)
+    privateRouter.use('/readers', readersPrivateRouter)
 }

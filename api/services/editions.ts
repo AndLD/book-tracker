@@ -6,9 +6,12 @@ async function createEdition(
     editionData: Omit<IBookEdition, '_id' | 'bookId'>,
     bookId: ObjectId
 ): Promise<IBookEditionBackend> {
+    const { readerIds, ...restEditionData } = editionData
+
     const editionToInsert: Omit<IBookEditionBackend, '_id' | 'bookId'> = {
-        ...editionData,
-        colorPalette: editionData.colorPalette || []
+        ...restEditionData,
+        colorPalette: editionData.colorPalette || [],
+        ...(editionData.readerIds ? { readerIds: editionData.readerIds.map((id) => new ObjectId(id)) } : {})
     }
     const result = await db
         .collection<IBookEditionBackend>('bookEditions')

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
     Typography,
     Button,
@@ -12,7 +12,6 @@ import {
     message,
     Select,
     Space,
-    DatePicker,
     Collapse,
     Divider
 } from 'antd'
@@ -31,12 +30,14 @@ import { useAddBookMutation } from '../../store/books.api'
 import { BookEditionType } from '@lib/utils/interfaces/bookEditions'
 import { useGetAuthorsQuery, useAddAuthorMutation } from '../../store/authors.api'
 import { useGetGenresQuery, useAddGenreMutation } from '../../store/genres.api'
+import { useGetReadersQuery, useAddReaderMutation } from '../../store/readers.api'
 
 const { Title, Text } = Typography
 const { Option } = Select
 const { Panel } = Collapse
 
 import LanguageSelect from '../../components/LanguageSelect'
+import AddNewPersonModal from '../../components/modals/AddNewPersonModal'
 
 const editionTypeOptions = {
     [BookEditionType.PAPER]: { label: 'Paper', icon: <BookOutlined /> },
@@ -49,10 +50,12 @@ export default function DashboardPage() {
     const [isAddBookModalVisible, setIsAddBookModalVisible] = useState(false)
     const [isAddAuthorModalVisible, setIsAddAuthorModalVisible] = useState(false)
     const [isAddGenreModalVisible, setIsAddGenreModalVisible] = useState(false)
+    const [isAddReaderModalVisible, setIsAddReaderModalVisible] = useState(false)
 
     const [addBookForm] = Form.useForm()
     const [addAuthorForm] = Form.useForm()
     const [addGenreForm] = Form.useForm()
+    const [addReaderForm] = Form.useForm()
 
     const authorIds: string[] = Form.useWatch('authorIds', addBookForm) || []
     const genreIds: string[] = Form.useWatch('genreIds', addBookForm)
@@ -63,9 +66,11 @@ export default function DashboardPage() {
     const [addBook, { isLoading: isAddBookLoading }] = useAddBookMutation()
     const [addAuthor, { isLoading: isAddAuthorLoading }] = useAddAuthorMutation()
     const [addGenre, { isLoading: isAddGenreLoading }] = useAddGenreMutation()
+    const [addReader, { isLoading: isAddReaderLoading }] = useAddReaderMutation()
 
     const { data: authors, isLoading: isAuthorsLoading } = useGetAuthorsQuery()
     const { data: genres, isLoading: isGenresLoading } = useGetGenresQuery()
+    const { data: readers, isLoading: isReadersLoading } = useGetReadersQuery()
 
     const showAddBookModal = () => {
         setIsAddBookModalVisible(true)
@@ -91,14 +96,17 @@ export default function DashboardPage() {
                         edition: {
                             type: values.type,
                             hoursDuration: values.hoursDuration,
-                            readers: values.readers,
+                            readerIds: values.readerIds,
                             publisher: values.publisher,
                             year: values.year,
                             language: values.language,
                             translators: values.translators,
                             isbn: values.isbn,
                             imageUrl: values.imageUrl,
-                            colorPalette: []
+                            colorPalette: [],
+                            rating: 0,
+                            disableRating: false,
+                            description: values.editionDescription
                         }
                     }).unwrap()
                     message.success('Book added successfully!')
@@ -193,6 +201,49 @@ export default function DashboardPage() {
     const handleAddGenreCancel = () => {
         setIsAddGenreModalVisible(false)
         addGenreForm.resetFields()
+    }
+
+    const showAddReaderModal = () => {
+        setIsAddReaderModalVisible(true)
+    }
+
+    const handleAddReaderOk = () => {
+        addReaderForm
+            .validateFields()
+            .then(async (values) => {
+                try {
+                    const birthDate = values.birthDate ? values.birthDate.valueOf() : undefined
+                    const deathDate = values.deathDate ? values.deathDate.valueOf() : undefined
+
+                    const { result: newReader } = await addReader({
+                        ...values,
+                        birthDate,
+                        deathDate,
+                        rating: 0,
+                        disableRating: false,
+                        colorPalette: []
+                    }).unwrap()
+                    message.success('Reader added successfully!')
+                    setIsAddReaderModalVisible(false)
+                    addReaderForm.resetFields()
+
+                    const currentReaderIds = addBookForm.getFieldValue('readerIds') || []
+                    addBookForm.setFieldsValue({
+                        readerIds: [...currentReaderIds, newReader._id]
+                    })
+                } catch (error) {
+                    message.error('Failed to add reader.')
+                    console.error('Failed to add reader:', error)
+                }
+            })
+            .catch((info) => {
+                console.log('Validate Failed:', info)
+            })
+    }
+
+    const handleAddReaderCancel = () => {
+        setIsAddReaderModalVisible(false)
+        addReaderForm.resetFields()
     }
 
     return (
@@ -337,8 +388,21 @@ export default function DashboardPage() {
                             <Form.Item name="hoursDuration" label="Hours Duration">
                                 <InputNumber style={{ width: '100%' }} min={0} />
                             </Form.Item>
-                            <Form.Item name="readers" label="Readers">
-                                <Select mode="tags" style={{ width: '100%' }} tokenSeparators={[',']} />
+                            <Form.Item name="readerIds" label="Readers">
+                                <Space.Compact style={{ width: '100%' }}>
+                                    <Select
+                                        mode="multiple"
+                                        allowClear
+                                        showSearch
+                                        placeholder="Select readers"
+                                        loading={isReadersLoading}
+                                        options={readers?.result?.map((reader) => ({
+                                            value: reader._id,
+                                            label: reader.name
+                                        }))}
+                                    />
+                                    <Button onClick={showAddReaderModal} icon={<PlusOutlined />} />
+                                </Space.Compact>
                             </Form.Item>
                         </>
                     ) : null}
@@ -378,6 +442,9 @@ export default function DashboardPage() {
                                         <Form.Item name="imageUrl" label="Image URL">
                                             <Input />
                                         </Form.Item>
+                                        <Form.Item name="editionDescription" label="Description">
+                                            <Input.TextArea rows={4} />
+                                        </Form.Item>
                                     </>
                                 )
                             }
@@ -386,42 +453,27 @@ export default function DashboardPage() {
                 </Form>
             </Modal>
 
-            <Modal
-                title="Add New Author"
+            <AddNewPersonModal
                 open={isAddAuthorModalVisible}
                 onOk={handleAddAuthorOk}
                 onCancel={handleAddAuthorCancel}
-                okText="Add Author"
-                confirmLoading={isAddAuthorLoading}
-            >
-                <Form form={addAuthorForm} layout="vertical" name="add_author_form">
-                    <Form.Item
-                        name="name"
-                        label="Author Name"
-                        rules={[{ required: true, message: "Please input the author's name!" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="englishName" label="English Name">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="nativeLn" label="Native Language">
-                        <LanguageSelect allowClear showSearch placeholder="Select native language" />
-                    </Form.Item>
-                    <Form.Item name="bio" label="Bio">
-                        <Input.TextArea rows={4} />
-                    </Form.Item>
-                    <Form.Item name="birthDate" label="Birth Date">
-                        <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item name="deathDate" label="Death Date">
-                        <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item name="imageUrl" label="Image URL">
-                        <Input />
-                    </Form.Item>
-                </Form>
-            </Modal>
+                form={addAuthorForm}
+                title="Add New Author"
+                nameLabel="Author Name"
+                nameRulesMessage="Please input the author's name!"
+                loading={isAddAuthorLoading}
+            />
+
+            <AddNewPersonModal
+                open={isAddReaderModalVisible}
+                onOk={handleAddReaderOk}
+                onCancel={handleAddReaderCancel}
+                form={addReaderForm}
+                title="Add New Reader"
+                nameLabel="Reader Name"
+                nameRulesMessage="Please input the reader's name!"
+                loading={isAddReaderLoading}
+            />
 
             <Modal
                 title="Add New Genre"

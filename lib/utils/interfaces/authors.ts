@@ -1,20 +1,5 @@
-import { ObjectId } from 'mongodb'
+import { IPerson, IPersonBackend } from './persons'
 
-export interface IAuthor {
-    _id: string
-    name: string
-    englishName?: string
-    nativeLn?: string
-    bio?: string
-    birthDate?: number
-    deathDate?: number
-    imageUrl?: string
-    altEmoji?: string
-    colorPalette: string[]
-    rating: number
-    disableRating: boolean
-}
+export interface IAuthor extends IPerson {}
 
-export interface IAuthorBackend extends Omit<IAuthor, '_id'> {
-    _id: ObjectId
-}
+export interface IAuthorBackend extends IPersonBackend {}
