@@ -7,6 +7,7 @@ import { statisticsApi } from './statistics.api'
 import { booksApi } from './books.api'
 import { authorsApi } from './authors.api'
 import { genresApi } from './genres.api'
+import { readersApi } from './readers.api'
 
 const rootReducer = combineReducers({
     appReducer,
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
     [statisticsApi.reducerPath]: statisticsApi.reducer,
     [booksApi.reducerPath]: booksApi.reducer,
     [authorsApi.reducerPath]: authorsApi.reducer,
-    [genresApi.reducerPath]: genresApi.reducer
+    [genresApi.reducerPath]: genresApi.reducer,
+    [readersApi.reducerPath]: readersApi.reducer
 })
 
 export const setupStore = () => {
@@ -31,7 +33,8 @@ export const setupStore = () => {
                 statisticsApi.middleware,
                 booksApi.middleware,
                 authorsApi.middleware,
-                genresApi.middleware
+                genresApi.middleware,
+                readersApi.middleware
             )
         }
     })
