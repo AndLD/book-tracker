@@ -7,10 +7,10 @@ const logger = getLogger('services/email')
 
 let transporter: nodemailer.Transporter<any> | undefined
 
-const EMAIL_SMTP_USER = process.env.EMAIL_SMTP_USER
-const EMAIL_SMTP_PASS = process.env.EMAIL_SMTP_PASS
-
 async function init() {
+    const EMAIL_SMTP_USER = process.env.EMAIL_SMTP_USER
+    const EMAIL_SMTP_PASS = process.env.EMAIL_SMTP_PASS
+
     if (!EMAIL_SMTP_USER || !EMAIL_SMTP_PASS) {
         logger.error('Email Service initialization failed: EMAIL_SMTP_USER or EMAIL_SMTP_PASS not found')
         return
@@ -43,6 +43,8 @@ async function _sendMail({ email, subject, html }: { email: string; subject: str
     if (!transporter) {
         return
     }
+
+    const EMAIL_SMTP_USER = process.env.EMAIL_SMTP_USER
 
     await transporter.sendMail({
         from: `${appName} <${EMAIL_SMTP_USER}>`,

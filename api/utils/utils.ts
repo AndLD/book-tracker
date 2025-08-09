@@ -1,7 +1,7 @@
 import fs from 'fs'
 import Jimp from 'jimp'
 import path from 'path'
-import { isProduction } from './constants'
+import { __dirname, isProduction } from './constants'
 
 export const Utils = {
     attachPayloadWordToKeysForObject(obj: any) {

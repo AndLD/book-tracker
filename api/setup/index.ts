@@ -8,9 +8,10 @@ import { emailService } from '../services/email'
 import { usersService } from '../services/users'
 import { cronService } from '../services/cron'
 import packageJson from '../package.json'
-import { environment } from '../utils/constants'
+import { __dirname, environment } from '../utils/constants'
 import { logsService } from '../services/logs'
 import fs from 'fs'
+import { notionService } from '../services/notion'
 
 const logger = getLogger('setup/index')
 
@@ -31,6 +32,8 @@ export async function startApp() {
     if (!staticFolderExists) {
         fs.mkdirSync(__dirname + '/../public')
     }
+
+    notionService.init()
 
     server.listen(port, () => {
         logger.info(`Server has been started on ${port}, env=${environment}`)

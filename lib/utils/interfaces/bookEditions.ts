@@ -27,6 +27,7 @@ export interface IBookEdition {
     description?: string
     rating: number
     disableRating: boolean
+    createdAt: number
 }
 
 export interface IBookEditionBackend extends Omit<IBookEdition, '_id' | 'bookId' | 'readerIds'> {

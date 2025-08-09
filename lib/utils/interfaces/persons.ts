@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb'
 
 export interface IPerson {
     _id: string
+    userId: string
     name: string
     englishName?: string
     nativeLn?: string
@@ -13,8 +14,10 @@ export interface IPerson {
     colorPalette: string[]
     rating: number
     disableRating: boolean
+    createdAt: number
 }
 
-export interface IPersonBackend extends Omit<IPerson, '_id'> {
+export interface IPersonBackend extends Omit<IPerson, '_id' | 'userId'> {
     _id: ObjectId
+    userId: ObjectId
 }
