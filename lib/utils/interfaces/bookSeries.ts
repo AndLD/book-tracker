@@ -5,6 +5,7 @@ export interface IBookSeries {
     userId: string
     name: string
     createdAt: number
+    isHighlighted?: boolean
 }
 
 export interface IBookSeriesBackend extends Omit<IBookSeries, '_id' | 'userId'> {

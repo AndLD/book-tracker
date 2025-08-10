@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-export type ReadingStatus = 'reading' | 'completed' | 'paused' | 'dropped'
+export type ReadingStatus = 'READING' | 'COMPLETED' | 'PAUSED' | 'DROPPED'
 
 export interface IReading {
     _id: string
@@ -9,9 +9,12 @@ export interface IReading {
     userId: string
     startDate?: number
     endDate?: number
+    year?: number
     comment?: string
     progress?: number
     status: ReadingStatus
+    createdAt: number
+    isDatesApproximate?: boolean
 }
 
 export interface IReadingBackend extends Omit<IReading, '_id' | 'bookId' | 'userId' | 'bookEditionId'> {

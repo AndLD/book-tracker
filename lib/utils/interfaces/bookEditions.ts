@@ -28,6 +28,7 @@ export interface IBookEdition {
     rating: number
     disableRating: boolean
     createdAt: number
+    isHighlighted?: boolean
 }
 
 export interface IBookEditionBackend extends Omit<IBookEdition, '_id' | 'bookId' | 'readerIds'> {

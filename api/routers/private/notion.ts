@@ -1,8 +1,9 @@
-import { Router } from 'express'
-import { notionControllers } from '../../controllers/private/notion'
+import { Router } from 'express';
+import { notionControllers } from '../../controllers/private/notion';
 
-const router = Router()
+const router = Router();
 
-router.get('/:pageId', notionControllers.getNotionPage)
+router.get('/:pageId', notionControllers.getNotionPage);
+router.post('/:pageId/parse', notionControllers.parseNotionPage);
 
-export default router
+export default router;
