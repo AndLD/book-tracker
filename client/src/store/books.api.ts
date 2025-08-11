@@ -7,9 +7,15 @@ export const booksApi = createApi({
     reducerPath: 'booksApi',
     baseQuery: baseQueryWithRefresh,
     endpoints: (builder) => ({
+        getBooks: builder.query<{ result: IBook[] }, void>({
+            query: () => 'api/private/books'
+        }),
         addBook: builder.mutation<
             { result: { book: IBook; edition: IBookEdition } },
-            { book: Omit<IBook, '_id'>; edition: Omit<IBookEdition, '_id' | 'bookId'> }
+            {
+                book: Omit<IBook, '_id' | 'createdAt' | 'userId'>
+                edition: Omit<IBookEdition, '_id' | 'bookId' | 'createdAt' | 'userId'>
+            }
         >({
             query: ({ book, edition }) => ({
                 url: 'api/private/books',
@@ -20,4 +26,4 @@ export const booksApi = createApi({
     })
 })
 
-export const { useAddBookMutation } = booksApi
+export const { useGetBooksQuery, useAddBookMutation } = booksApi

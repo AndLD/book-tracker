@@ -3,7 +3,7 @@ import { db } from '../services/db'
 import { ObjectId } from 'mongodb'
 
 async function createEdition(
-    editionData: Omit<IBookEdition, '_id' | 'bookId'>,
+    editionData: Omit<IBookEdition, '_id' | 'bookId' | 'createdAt'>,
     bookId: ObjectId
 ): Promise<IBookEditionBackend> {
     const { readerIds, ...restEditionData } = editionData
@@ -11,7 +11,8 @@ async function createEdition(
     const editionToInsert: Omit<IBookEditionBackend, '_id' | 'bookId'> = {
         ...restEditionData,
         colorPalette: editionData.colorPalette || [],
-        ...(editionData.readerIds ? { readerIds: editionData.readerIds.map((id) => new ObjectId(id)) } : {})
+        ...(editionData.readerIds ? { readerIds: editionData.readerIds.map((id) => new ObjectId(id)) } : {}),
+        createdAt: Date.now()
     }
     const result = await db
         .collection<IBookEditionBackend>('bookEditions')
