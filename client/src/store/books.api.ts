@@ -12,7 +12,10 @@ export const booksApi = createApi({
         }),
         addBook: builder.mutation<
             { result: { book: IBook; edition: IBookEdition } },
-            { book: Omit<IBook, '_id' | 'createdAt'>; edition: Omit<IBookEdition, '_id' | 'bookId' | 'createdAt'> }
+            {
+                book: Omit<IBook, '_id' | 'createdAt' | 'userId'>
+                edition: Omit<IBookEdition, '_id' | 'bookId' | 'createdAt' | 'userId'>
+            }
         >({
             query: ({ book, edition }) => ({
                 url: 'api/private/books',

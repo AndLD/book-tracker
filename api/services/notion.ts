@@ -32,6 +32,8 @@ type ParsedData = {
     readings: Record<string, IReading>
 }
 
+const DEFAULT_BOOK_EDITION_TYPE: BookEditionType = BookEditionType.AUDIOBOOK
+
 async function init() {
     if (notion) {
         return
@@ -111,21 +113,21 @@ function parseTitle(titleArray: any[][]): {
 function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: ParsedData, userId: string, year?: number) {
     const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted } = parseTitle(titleArray)
     const regex =
-        /^(?:(.+?)\s*\/\/\s*)?(.+)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?$/
+        /^(?:(.+?)\s*\/\/\s*)?(.+)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\((.*)\))?$/
     const match = title.match(regex)
 
     if (!match) {
         return
     }
 
-    let [, seriesTitle, bookTitle, publishYear, authorName, dates, duration] = match
+    let [, seriesTitle, bookTitle, publishYear, authorName, dates, duration, comment] = match
 
     const isDropped = title.includes('[[')
     if (isDropped) {
         bookTitle = bookTitle.replace('[[s]]', '')
     }
 
-    const authorNames = authorName.split(',').map((name) => name.trim())
+    const authorNames = authorName.split(', ').map((name) => name.trim())
     const authorIds = authorNames.map((name) => {
         let authorId = Object.values(parsedData.authors).find((a) => a.name === name)?._id
         if (!authorId) {
@@ -181,11 +183,13 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
         parsedData.books[bookId] = newBook
     }
 
-    const editionType = duration
-        ? BookEditionType.AUDIOBOOK
-        : /\([рp]\)/.test(title)
-          ? BookEditionType.RADIO_PLAY
-          : BookEditionType.AUDIOBOOK
+    const isRadioPlay = /\([рp]\)/.test(title)
+
+    const editionType = isRadioPlay
+        ? BookEditionType.RADIO_PLAY
+        : duration
+          ? BookEditionType.AUDIOBOOK
+          : DEFAULT_BOOK_EDITION_TYPE
 
     let editionId = Object.values(parsedData.bookEditions).find(
         (e) =>
@@ -217,7 +221,8 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
         const isDatesApproximate = dates.startsWith('~')
         const cleanDates = isDatesApproximate ? dates.substring(1) : dates
         const readingDates = cleanDates.split(',').map((d) => d.trim())
-        for (const date of readingDates) {
+        for (let i = 0; i < readingDates.length; i++) {
+            const date = readingDates[i]
             const readingId = new ObjectId().toHexString()
             let startDate: number | undefined
             let endDate: number | undefined
@@ -242,6 +247,9 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
                 year,
                 isDatesApproximate
             }
+            if (i === readingDates.length - 1 && comment) {
+                newReading.comment = comment.trim()
+            }
             parsedData.readings[readingId] = newReading
         }
     } else {
@@ -253,7 +261,8 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
             userId,
             status: isDropped ? 'READING' : 'COMPLETED',
             createdAt: block.value.created_time,
-            year
+            year,
+            comment: comment ? comment.trim() : undefined
         }
         parsedData.readings[readingId] = newReading
     }

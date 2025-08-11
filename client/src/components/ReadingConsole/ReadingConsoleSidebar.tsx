@@ -134,13 +134,13 @@ export default function ReadingConsoleSidebar({
                         children: [
                             {
                                 key: '3',
-                                icon: <ReadOutlined style={{ color: iconColors[2] }} />,
-                                label: 'Currently Reading'
+                                icon: <CheckCircleOutlined style={{ color: iconColors[3] }} />,
+                                label: 'Completed Books'
                             },
                             {
                                 key: '4',
-                                icon: <CheckCircleOutlined style={{ color: iconColors[3] }} />,
-                                label: 'Completed Books'
+                                icon: <ReadOutlined style={{ color: iconColors[2] }} />,
+                                label: 'Currently Reading'
                             },
                             { key: '5', icon: <BookOutlined style={{ color: iconColors[4] }} />, label: 'Reading Plan' }
                         ]
