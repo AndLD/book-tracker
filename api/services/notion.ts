@@ -5,6 +5,7 @@ import { IBook } from '@lib/utils/interfaces/books'
 import { IBookSeries } from '@lib/utils/interfaces/bookSeries'
 import { IBookEdition, BookEditionType } from '@lib/utils/interfaces/bookEditions'
 import { IReading, ReadingStatus } from '@lib/utils/interfaces/readings'
+import { NotionParsedData } from '@lib/utils/interfaces/notion'
 import { NotionAPI } from 'notion-client'
 import { getLogger } from '../utils/logger'
 
@@ -22,14 +23,6 @@ type NotionBlock = {
         content?: string[]
         created_time: number
     }
-}
-
-type ParsedData = {
-    authors: Record<string, IAuthor>
-    books: Record<string, IBook>
-    bookSeries: Record<string, IBookSeries>
-    bookEditions: Record<string, IBookEdition>
-    readings: Record<string, IReading>
 }
 
 const DEFAULT_BOOK_EDITION_TYPE: BookEditionType = BookEditionType.AUDIOBOOK
@@ -77,11 +70,13 @@ function parseTitle(titleArray: any[][]): {
     url?: string
     isSeriesHighlighted: boolean
     isTitleHighlighted: boolean
+    isDropped: boolean
 } {
     let text = ''
     let url: string | undefined
     let isSeriesHighlighted = false
     let isTitleHighlighted = false
+    let isDropped = false
 
     const fullText = titleArray.map((segment) => segment[0]).join('')
     const seriesSeparatorIndex = fullText.indexOf('//')
@@ -101,31 +96,35 @@ function parseTitle(titleArray: any[][]): {
                         isTitleHighlighted = true
                     }
                 }
+                if (format[0] === 's') {
+                    isDropped = true
+                }
             }
         }
         accumulatedLength += segmentText.length
         text += segmentText
     }
 
-    return { text, url, isSeriesHighlighted, isTitleHighlighted }
+    return { text, url, isSeriesHighlighted, isTitleHighlighted, isDropped }
 }
 
-function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: ParsedData, userId: string, year?: number) {
-    const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted } = parseTitle(titleArray)
+function parseBookEntry(
+    titleArray: any[],
+    block: NotionBlock,
+    parsedData: NotionParsedData,
+    userId: string,
+    year?: number
+): string[] {
+    const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted, isDropped } = parseTitle(titleArray)
     const regex =
-        /^(?:(.+?)\s*\/\/\s*)?(.+)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\((.*)\))?$/
+        /^(?:(.+?)\s*\/\/\s*)?(.+?)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\{(.*)\})?$/
     const match = title.match(regex)
 
     if (!match) {
-        return
+        return []
     }
 
     let [, seriesTitle, bookTitle, publishYear, authorName, dates, duration, comment] = match
-
-    const isDropped = title.includes('[[')
-    if (isDropped) {
-        bookTitle = bookTitle.replace('[[s]]', '')
-    }
 
     const authorNames = authorName.split(', ').map((name) => name.trim())
     const authorIds = authorNames.map((name) => {
@@ -217,6 +216,8 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
         parsedData.bookEditions[editionId] = newEdition
     }
 
+    const createdReadingIds: string[] = []
+
     if (dates) {
         const isDatesApproximate = dates.startsWith('~')
         const cleanDates = isDatesApproximate ? dates.substring(1) : dates
@@ -251,6 +252,7 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
                 newReading.comment = comment.trim()
             }
             parsedData.readings[readingId] = newReading
+            createdReadingIds.push(readingId)
         }
     } else {
         const readingId = new ObjectId().toHexString()
@@ -259,16 +261,19 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
             bookId,
             bookEditionId: editionId,
             userId,
-            status: isDropped ? 'READING' : 'COMPLETED',
+            status: isDropped ? 'DROPPED' : 'COMPLETED',
             createdAt: block.value.created_time,
             year,
             comment: comment ? comment.trim() : undefined
         }
         parsedData.readings[readingId] = newReading
+        createdReadingIds.push(readingId)
     }
+
+    return createdReadingIds
 }
 
-async function parsePage(pageId: string, userId: string): Promise<ParsedData> {
+async function parsePage(pageId: string, userId: string): Promise<NotionParsedData> {
     // const page = await notionService.getPage(pageId)
     // if (!page) {
     //     throw new Error(`Failed to fetch page with ID ${pageId}`)
@@ -280,12 +285,13 @@ async function parsePage(pageId: string, userId: string): Promise<ParsedData> {
 
     const getBlock = (blockId: string): NotionBlock | undefined => blocks[blockId]
 
-    const parsedData: ParsedData = {
+    const parsedData: NotionParsedData = {
         authors: {},
         books: {},
         bookSeries: {},
         bookEditions: {},
-        readings: {}
+        readings: {},
+        yearReadingsOrders: []
     }
 
     const mainPage = Object.values(blocks).find(
@@ -314,7 +320,9 @@ async function parsePage(pageId: string, userId: string): Promise<ParsedData> {
 
         for (const yearToggle of yearToggles) {
             const yearTitle = yearToggle.value.properties?.title?.flat(Infinity).join('') || ''
-            const year = /\d{4}/.test(yearTitle) ? parseInt(yearTitle) : undefined
+            const yearMatch = yearTitle.match(/\d{4}/)
+            const year = yearMatch ? parseInt(yearMatch[0]) : undefined
+            const orderedReadingIdsForYear: string[] = []
 
             const bookEntries = yearToggle.value.content?.map(getBlock).filter((block): block is NotionBlock => !!block)
 
@@ -331,14 +339,23 @@ async function parsePage(pageId: string, userId: string): Promise<ParsedData> {
                     if (nestedBookEntries) {
                         for (const nestedBookEntry of nestedBookEntries) {
                             const titleArray = nestedBookEntry.value.properties?.title || []
-                            parseBookEntry(titleArray, nestedBookEntry, parsedData, userId, year)
+                            const newReadingIds = parseBookEntry(titleArray, nestedBookEntry, parsedData, userId, year)
+                            orderedReadingIdsForYear.push(...newReadingIds)
                         }
                     }
                 } else {
                     const titleArray = bookEntry.value.properties?.title || []
-                    parseBookEntry(titleArray, bookEntry, parsedData, userId, year)
+                    const newReadingIds = parseBookEntry(titleArray, bookEntry, parsedData, userId, year)
+                    orderedReadingIdsForYear.push(...newReadingIds)
                 }
             }
+
+            parsedData.yearReadingsOrders.push({
+                _id: new ObjectId().toHexString(),
+                userId,
+                year: year || null,
+                orderedReadingIds: orderedReadingIdsForYear
+            })
         }
     }
 

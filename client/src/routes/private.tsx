@@ -47,12 +47,12 @@ const privateRoutes: RouteObject[] = [
                 element: <AnalyticsPage />
             },
             {
-                path: 'currently-reading',
-                element: <CurrentlyReadingPage />
-            },
-            {
                 path: 'completed-books',
                 element: <CompletedBooksPage />
+            },
+            {
+                path: 'currently-reading',
+                element: <CurrentlyReadingPage />
             },
             {
                 path: 'reading-plan',

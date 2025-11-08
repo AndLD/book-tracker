@@ -57,7 +57,18 @@ export const errors = {
 export const entities = {
     USERS: 'users' as Collection,
     SETTINGS: 'settings' as Collection,
-    LOGS: 'logs' as Collection
+    LOGS: 'logs' as Collection,
+    BOOKS: 'books' as Collection,
+    AUTHORS: 'authors' as Collection,
+    GENRES: 'genres' as Collection,
+    BOOK_SERIES: 'bookSeries' as Collection,
+    BOOK_EDITIONS: 'bookEditions' as Collection,
+    READINGS: 'readings' as Collection,
+    READERS: 'readers' as Collection,
+    REVIEWS: 'reviews' as Collection,
+    RECOMMENDATIONS: 'recommendations' as Collection,
+    RECOMMENDERS: 'recommenders' as Collection,
+    VOCABULARY: 'vocabulary' as Collection
 }
 
 export const validationConstants = {

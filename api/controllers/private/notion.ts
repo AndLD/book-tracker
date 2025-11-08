@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { notionService } from '../../services/notion'
+import { booksService } from '../../services/books'
 import { tryCatch } from '../../utils/decorators'
 import { apiUtils } from '../../utils/api'
 import { AuthorizedRequest } from '../../utils/types'
@@ -39,6 +40,7 @@ async function parseNotionPage(req: AuthorizedRequest, res: Response) {
     }
 
     const parsedData = await notionService.parsePage(pageId, userId)
+    await booksService.importData(parsedData)
     apiUtils.sendResult(res, parsedData)
 }
 

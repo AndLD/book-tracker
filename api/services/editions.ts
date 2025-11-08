@@ -1,6 +1,7 @@
 import { IBookEdition, IBookEditionBackend } from '@lib/utils/interfaces/bookEditions'
 import { db } from '../services/db'
 import { ObjectId } from 'mongodb'
+import { entities } from '../utils/constants'
 
 async function createEdition(
     editionData: Omit<IBookEdition, '_id' | 'bookId' | 'createdAt'>,
@@ -15,7 +16,7 @@ async function createEdition(
         createdAt: Date.now()
     }
     const result = await db
-        .collection<IBookEditionBackend>('bookEditions')
+        .collection<IBookEditionBackend>(entities.BOOK_EDITIONS)
         .insertOne({ ...editionToInsert, bookId } as any)
     return { ...editionToInsert, _id: result.insertedId, bookId } as IBookEditionBackend
 }

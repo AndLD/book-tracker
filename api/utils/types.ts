@@ -1,6 +1,20 @@
 import { NextFunction, Request, Response } from 'express'
 
-export type Collection = 'users' | 'logs'
+export type Collection =
+    | 'users'
+    | 'settings'
+    | 'logs'
+    | 'books'
+    | 'authors'
+    | 'genres'
+    | 'bookseries'
+    | 'bookeditions'
+    | 'readings'
+    | 'readers'
+    | 'reviews'
+    | 'recommendations'
+    | 'recommenders'
+    | 'vocabulary'
 
 export type Controller = (req: Request, res: Response, next?: NextFunction) => any
 
