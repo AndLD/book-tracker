@@ -27,7 +27,17 @@ async function fetchBooks(req: AuthorizedRequest, res: Response) {
     apiUtils.sendResult(res, books)
 }
 
+async function getCompletedBooks(req: AuthorizedRequest, res: Response) {
+    const userId = req.user?._id
+    if (!userId) {
+        return res.sendStatus(500)
+    }
+    const completedBooks = await booksService.getCompletedBooks(userId)
+    apiUtils.sendResult(res, completedBooks)
+}
+
 export const booksControllers = {
     addBook: tryCatch(addBook),
-    fetchBooks: tryCatch(fetchBooks)
+    fetchBooks: tryCatch(fetchBooks),
+    getCompletedBooks: tryCatch(getCompletedBooks)
 }

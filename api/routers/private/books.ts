@@ -6,5 +6,6 @@ const router = Router()
 
 router.get('/', booksControllers.fetchBooks)
 router.post('/', validateAddBook, booksControllers.addBook)
+router.get('/completed', booksControllers.getCompletedBooks)
 
 export default router

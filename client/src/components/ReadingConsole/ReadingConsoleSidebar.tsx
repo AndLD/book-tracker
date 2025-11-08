@@ -29,8 +29,8 @@ interface ReadingConsoleSidebarProps {
 const iconColors = [
     '#FF6B6B',
     '#4ECDC4',
-    '#45B7D1',
     '#FED766',
+    '#45B7D1',
     '#247BA0',
     '#F2E205',
     '#F2B2A0',
@@ -61,10 +61,10 @@ export default function ReadingConsoleSidebar({
                 path = 'analytics'
                 break
             case '3':
-                path = 'currently-reading'
+                path = 'completed-books'
                 break
             case '4':
-                path = 'completed-books'
+                path = 'currently-reading'
                 break
             case '5':
                 path = 'reading-plan'
@@ -134,12 +134,12 @@ export default function ReadingConsoleSidebar({
                         children: [
                             {
                                 key: '3',
-                                icon: <CheckCircleOutlined style={{ color: iconColors[3] }} />,
+                                icon: <CheckCircleOutlined style={{ color: iconColors[2] }} />,
                                 label: 'Completed Books'
                             },
                             {
                                 key: '4',
-                                icon: <ReadOutlined style={{ color: iconColors[2] }} />,
+                                icon: <ReadOutlined style={{ color: iconColors[3] }} />,
                                 label: 'Currently Reading'
                             },
                             { key: '5', icon: <BookOutlined style={{ color: iconColors[4] }} />, label: 'Reading Plan' }

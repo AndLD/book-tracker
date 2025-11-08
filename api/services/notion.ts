@@ -5,6 +5,7 @@ import { IBook } from '@lib/utils/interfaces/books'
 import { IBookSeries } from '@lib/utils/interfaces/bookSeries'
 import { IBookEdition, BookEditionType } from '@lib/utils/interfaces/bookEditions'
 import { IReading, ReadingStatus } from '@lib/utils/interfaces/readings'
+import { NotionParsedData } from '@lib/utils/interfaces/notion'
 import { NotionAPI } from 'notion-client'
 import { getLogger } from '../utils/logger'
 
@@ -22,14 +23,6 @@ type NotionBlock = {
         content?: string[]
         created_time: number
     }
-}
-
-type ParsedData = {
-    authors: Record<string, IAuthor>
-    books: Record<string, IBook>
-    bookSeries: Record<string, IBookSeries>
-    bookEditions: Record<string, IBookEdition>
-    readings: Record<string, IReading>
 }
 
 const DEFAULT_BOOK_EDITION_TYPE: BookEditionType = BookEditionType.AUDIOBOOK
@@ -110,7 +103,13 @@ function parseTitle(titleArray: any[][]): {
     return { text, url, isSeriesHighlighted, isTitleHighlighted }
 }
 
-function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: ParsedData, userId: string, year?: number) {
+function parseBookEntry(
+    titleArray: any[],
+    block: NotionBlock,
+    parsedData: NotionParsedData,
+    userId: string,
+    year?: number
+) {
     const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted } = parseTitle(titleArray)
     const regex =
         /^(?:(.+?)\s*\/\/\s*)?(.+)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\((.*)\))?$/
@@ -268,7 +267,7 @@ function parseBookEntry(titleArray: any[], block: NotionBlock, parsedData: Parse
     }
 }
 
-async function parsePage(pageId: string, userId: string): Promise<ParsedData> {
+async function parsePage(pageId: string, userId: string): Promise<NotionParsedData> {
     // const page = await notionService.getPage(pageId)
     // if (!page) {
     //     throw new Error(`Failed to fetch page with ID ${pageId}`)
@@ -280,7 +279,7 @@ async function parsePage(pageId: string, userId: string): Promise<ParsedData> {
 
     const getBlock = (blockId: string): NotionBlock | undefined => blocks[blockId]
 
-    const parsedData: ParsedData = {
+    const parsedData: NotionParsedData = {
         authors: {},
         books: {},
         bookSeries: {},

@@ -12,6 +12,7 @@ import genresPrivateRouter from '../routers/private/genres'
 import readersPrivateRouter from '../routers/private/readers'
 import usersPublicRouter from '../routers/public/users'
 import notionPrivateRouter from '../routers/private/notion'
+import adminPrivateRouter from '../routers/private/admin'
 
 export function setupRouters(app: Express) {
     const apiRouter = Router()
@@ -36,4 +37,5 @@ export function setupRouters(app: Express) {
     privateRouter.use('/genres', genresPrivateRouter)
     privateRouter.use('/readers', readersPrivateRouter)
     privateRouter.use('/notion', notionPrivateRouter)
+    privateRouter.use('/admin', adminPrivateRouter)
 }

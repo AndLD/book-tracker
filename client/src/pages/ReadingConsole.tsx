@@ -25,10 +25,10 @@ export default function ReadingConsolePage() {
             case 'analytics':
                 setSelectedKey('2')
                 break
-            case 'currently-reading':
+            case 'completed-books':
                 setSelectedKey('3')
                 break
-            case 'completed-books':
+            case 'currently-reading':
                 setSelectedKey('4')
                 break
             case 'reading-plan':
