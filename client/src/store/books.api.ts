@@ -3,12 +3,14 @@ import { IBook } from '@lib/utils/interfaces/books'
 import { IBookEdition } from '@lib/utils/interfaces/bookEditions'
 import { IReading } from '@lib/utils/interfaces/readings'
 import { IAuthor } from '@lib/utils/interfaces/authors'
+import { IBookSeries } from '@lib/utils/interfaces/bookSeries'
 import { baseQueryWithRefresh } from '../utils/store'
 
 export interface ICompletedReading extends IReading {
-    book: IBook;
-    authors: IAuthor[];
-    edition: IBookEdition;
+    book: IBook
+    authors: IAuthor[]
+    edition: IBookEdition
+    bookSeries?: IBookSeries
 }
 
 export interface ICompletedBooksGroup {

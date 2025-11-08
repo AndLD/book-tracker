@@ -50,6 +50,20 @@ async function getCompletedBooks(userId: string) {
         { $unwind: '$book' },
         {
             $lookup: {
+                from: entities.BOOK_SERIES,
+                localField: 'book.bookSeriesId',
+                foreignField: '_id',
+                as: 'bookSeries'
+            }
+        },
+        {
+            $unwind: {
+                path: '$bookSeries',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
                 from: entities.AUTHORS,
                 localField: 'book.authorIds',
                 foreignField: '_id',
@@ -67,19 +81,30 @@ async function getCompletedBooks(userId: string) {
         { $unwind: '$edition' },
         {
             $sort: {
-                endDate: -1,
-                createdAt: -1
+                endDate: 1,
+                createdAt: 1
             }
         },
         {
             $group: {
                 _id: '$year',
-                readings: { $push: '$ROOT' }
+                readings: {
+                    $push: {
+                        _id: '$_id',
+                        status: '$status',
+                        startDate: '$startDate',
+                        endDate: '$endDate',
+                        book: '$book',
+                        authors: '$authors',
+                        edition: '$edition',
+                        bookSeries: '$bookSeries'
+                    }
+                }
             }
         },
         {
             $sort: {
-                _id: -1
+                _id: 1
             }
         }
     ]

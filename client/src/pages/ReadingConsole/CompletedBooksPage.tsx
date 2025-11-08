@@ -9,17 +9,19 @@ interface GroupedReading {
     authors: ICompletedReading['authors']
     edition: ICompletedReading['edition']
     readings: ICompletedReading[]
+    bookSeries?: ICompletedReading['bookSeries']
 }
 
 function formatReading(groupedReading: GroupedReading) {
-    const { book, authors, edition, readings } = groupedReading
+    const { book, authors, edition, readings, bookSeries } = groupedReading
     const authorNames = authors.map((author) => author.name).join(', ')
     const dates = readings.map((r) => (r.endDate ? new Date(r.endDate).toLocaleDateString() : 'X')).join(', ')
     const duration = edition.hoursDuration ? `(${edition.hoursDuration}ч)` : ''
-    const comment = readings[readings.length - 1].comment ? `(${readings[readings.length - 1].comment})` : ''
+    const comment = readings[readings.length - 1].comment ? `{${readings[readings.length - 1].comment}}` : ''
     const publishYear = edition.year ? `(${edition.year})` : ''
+    const seriesName = bookSeries ? `${bookSeries.name} // ` : ''
 
-    return `${book.title} ${publishYear} - ${authorNames} [${dates}] ${duration} ${comment}`
+    return `${seriesName}${book.title} ${publishYear} - ${authorNames} [${dates}] ${duration} ${comment}`
 }
 
 function groupReadings(readings: ICompletedReading[]): GroupedReading[] {
@@ -32,7 +34,8 @@ function groupReadings(readings: ICompletedReading[]): GroupedReading[] {
                 book: reading.book,
                 authors: reading.authors,
                 edition: reading.edition,
-                readings: []
+                readings: [],
+                bookSeries: reading.bookSeries
             }
         }
         grouped[key].readings.push(reading)
