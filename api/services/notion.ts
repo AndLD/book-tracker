@@ -114,14 +114,14 @@ function parseBookEntry(
     parsedData: NotionParsedData,
     userId: string,
     year?: number
-) {
+): string[] {
     const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted, isDropped } = parseTitle(titleArray)
     const regex =
         /^(?:(.+?)\s*\/\/\s*)?(.+?)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\{(.*)\})?$/
     const match = title.match(regex)
 
     if (!match) {
-        return
+        return []
     }
 
     let [, seriesTitle, bookTitle, publishYear, authorName, dates, duration, comment] = match
@@ -216,6 +216,8 @@ function parseBookEntry(
         parsedData.bookEditions[editionId] = newEdition
     }
 
+    const createdReadingIds: string[] = []
+
     if (dates) {
         const isDatesApproximate = dates.startsWith('~')
         const cleanDates = isDatesApproximate ? dates.substring(1) : dates
@@ -250,6 +252,7 @@ function parseBookEntry(
                 newReading.comment = comment.trim()
             }
             parsedData.readings[readingId] = newReading
+            createdReadingIds.push(readingId)
         }
     } else {
         const readingId = new ObjectId().toHexString()
@@ -264,7 +267,10 @@ function parseBookEntry(
             comment: comment ? comment.trim() : undefined
         }
         parsedData.readings[readingId] = newReading
+        createdReadingIds.push(readingId)
     }
+
+    return createdReadingIds
 }
 
 async function parsePage(pageId: string, userId: string): Promise<NotionParsedData> {
@@ -284,7 +290,8 @@ async function parsePage(pageId: string, userId: string): Promise<NotionParsedDa
         books: {},
         bookSeries: {},
         bookEditions: {},
-        readings: {}
+        readings: {},
+        yearReadingsOrders: []
     }
 
     const mainPage = Object.values(blocks).find(
@@ -315,6 +322,7 @@ async function parsePage(pageId: string, userId: string): Promise<NotionParsedDa
             const yearTitle = yearToggle.value.properties?.title?.flat(Infinity).join('') || ''
             const yearMatch = yearTitle.match(/\d{4}/)
             const year = yearMatch ? parseInt(yearMatch[0]) : undefined
+            const orderedReadingIdsForYear: string[] = []
 
             const bookEntries = yearToggle.value.content?.map(getBlock).filter((block): block is NotionBlock => !!block)
 
@@ -331,14 +339,23 @@ async function parsePage(pageId: string, userId: string): Promise<NotionParsedDa
                     if (nestedBookEntries) {
                         for (const nestedBookEntry of nestedBookEntries) {
                             const titleArray = nestedBookEntry.value.properties?.title || []
-                            parseBookEntry(titleArray, nestedBookEntry, parsedData, userId, year)
+                            const newReadingIds = parseBookEntry(titleArray, nestedBookEntry, parsedData, userId, year)
+                            orderedReadingIdsForYear.push(...newReadingIds)
                         }
                     }
                 } else {
                     const titleArray = bookEntry.value.properties?.title || []
-                    parseBookEntry(titleArray, bookEntry, parsedData, userId, year)
+                    const newReadingIds = parseBookEntry(titleArray, bookEntry, parsedData, userId, year)
+                    orderedReadingIdsForYear.push(...newReadingIds)
                 }
             }
+
+            parsedData.yearReadingsOrders.push({
+                _id: new ObjectId().toHexString(),
+                userId,
+                year: year || null,
+                orderedReadingIds: orderedReadingIdsForYear
+            })
         }
     }
 

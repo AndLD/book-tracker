@@ -1,8 +1,19 @@
-import { Collapse, List, Spin, Typography } from 'antd'
-import { useGetCompletedBooksQuery, ICompletedReading } from '../../store/books.api'
+import { Button, Collapse, List, Spin, Typography } from 'antd'
+import { useGetCompletedBooksQuery, ICompletedReading, ICompletedBooksGroup } from '../../store/books.api'
+import { useState } from 'react'
 
 const { Panel } = Collapse
 const { Title, Text } = Typography
+
+const DEBUG_COLORS = {
+    seriesName: 'red',
+    bookTitle: 'green',
+    publishYear: 'blue',
+    authorNames: 'purple',
+    dates: 'orange',
+    duration: 'brown',
+    comment: 'grey'
+}
 
 interface GroupedReading {
     book: ICompletedReading['book']
@@ -83,6 +94,7 @@ function groupReadings(readings: ICompletedReading[]): GroupedReading[] {
 
 export default function CompletedBooksPage() {
     const { data, isLoading, isError } = useGetCompletedBooksQuery()
+    const [debugMode, setDebugMode] = useState(false)
 
     if (isLoading) {
         return <Spin />
@@ -104,35 +116,62 @@ export default function CompletedBooksPage() {
 
     const renderItem = (groupedReading: GroupedReading) => {
         const parts = formatReading(groupedReading)
+        const style = (color: string, text: string) => (debugMode && text ? { border: `1px solid ${color}` } : {})
+
         return (
             <List.Item>
-                {parts.isSeriesHighlighted ? <Text strong>{parts.seriesName}</Text> : parts.seriesName}
-                {parts.isDropped ? (
-                    <Text delete>{parts.bookTitle}</Text>
-                ) : parts.isTitleHighlighted ? (
-                    <Text strong>{parts.bookTitle}</Text>
-                ) : (
-                    parts.bookTitle
-                )}{' '}
-                {parts.publishYear} - {parts.authorNames} [{parts.dates}] {parts.duration} {parts.comment}
+                <span style={style(DEBUG_COLORS.seriesName, parts.seriesName)}>
+                    {parts.isSeriesHighlighted ? <Text strong>{parts.seriesName}</Text> : parts.seriesName}
+                </span>
+                <span style={style(DEBUG_COLORS.bookTitle, parts.bookTitle)}>
+                    {parts.isDropped ? (
+                        <Text delete>{parts.bookTitle}</Text>
+                    ) : parts.isTitleHighlighted ? (
+                        <Text strong>{parts.bookTitle}</Text>
+                    ) : (
+                        parts.bookTitle
+                    )}
+                </span>{' '}
+                <span style={style(DEBUG_COLORS.publishYear, parts.publishYear)}>{parts.publishYear}</span> -{' '}
+                <span style={style(DEBUG_COLORS.authorNames, parts.authorNames)}>{parts.authorNames}</span>{' '}
+                <span style={style(DEBUG_COLORS.dates, `[${parts.dates}]`)}>[{parts.dates}]</span>{' '}
+                <span style={style(DEBUG_COLORS.duration, parts.duration)}>{parts.duration}</span>{' '}
+                <span style={style(DEBUG_COLORS.comment, parts.comment)}>{parts.comment}</span>
             </List.Item>
         )
+    }
+
+    const getSortedReadings = (group: ICompletedBooksGroup) => {
+        if (!group.orderedReadingIds) {
+            return group.readings
+        }
+        return [...group.readings].sort((a, b) => {
+            const aIndex = group.orderedReadingIds.indexOf(a._id)
+            const bIndex = group.orderedReadingIds.indexOf(b._id)
+            if (aIndex === -1) return 1
+            if (bIndex === -1) return -1
+            return aIndex - bIndex
+        })
     }
 
     return (
         <div>
             <Title level={1}>Completed Books</Title>
+            <Button onClick={() => setDebugMode(!debugMode)}>{debugMode ? 'Disable' : 'Enable'} Debug Mode</Button>
             {readingsWithoutYear && (
                 <Collapse>
                     <Panel header={`Before ${earliestYear}`} key="before">
-                        <List dataSource={groupReadings(readingsWithoutYear.readings)} renderItem={renderItem} />
+                        <List
+                            dataSource={groupReadings(getSortedReadings(readingsWithoutYear))}
+                            renderItem={renderItem}
+                        />
                     </Panel>
                 </Collapse>
             )}
             <Collapse>
                 {readingsWithYear.map((group) => (
                     <Panel header={group._id} key={group._id}>
-                        <List dataSource={groupReadings(group.readings)} renderItem={renderItem} />
+                        <List dataSource={groupReadings(getSortedReadings(group))} renderItem={renderItem} />
                     </Panel>
                 ))}
             </Collapse>

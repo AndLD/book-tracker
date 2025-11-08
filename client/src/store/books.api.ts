@@ -16,6 +16,7 @@ export interface ICompletedReading extends IReading {
 export interface ICompletedBooksGroup {
     _id: number | null
     readings: ICompletedReading[]
+    orderedReadingIds?: string[]
 }
 
 export const booksApi = createApi({

@@ -36,7 +36,11 @@ async function getBooks(userId?: string): Promise<IBookBackend[]> {
 }
 
 async function getCompletedBooks(userId: string) {
-    const query = { userId: new ObjectId(userId), status: { $in: ['COMPLETED', 'DROPPED'] } }
+    const query = {
+        userId: new ObjectId(userId),
+        status: { $in: ['COMPLETED', 'DROPPED'] }
+    }
+
     const pipeline = [
         { $match: query },
         {
@@ -78,13 +82,21 @@ async function getCompletedBooks(userId: string) {
                 as: 'edition'
             }
         },
-        { $unwind: '$edition' },
         {
-            $sort: {
-                endDate: 1,
-                createdAt: 1
+            $unwind: {
+                path: '$edition',
+                preserveNullAndEmptyArrays: true
             }
         },
+
+        {
+            $group: {
+                _id: '$_id',
+                doc: { $first: '$$ROOT' }
+            }
+        },
+        { $replaceRoot: { newRoot: '$doc' } },
+
         {
             $group: {
                 _id: '$year',
@@ -102,6 +114,39 @@ async function getCompletedBooks(userId: string) {
                 }
             }
         },
+
+        {
+            $lookup: {
+                from: 'yearReadingsOrders',
+                let: { year: '$_id' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [{ $eq: ['$year', '$$year'] }, { $eq: ['$userId', new ObjectId(userId)] }]
+                            }
+                        }
+                    }
+                ],
+                as: 'order'
+            }
+        },
+        {
+            $unwind: {
+                path: '$order',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $addFields: {
+                orderedReadingIds: '$order.orderedReadingIds'
+            }
+        },
+        {
+            $project: {
+                order: 0
+            }
+        },
         {
             $sort: {
                 _id: 1
@@ -113,7 +158,7 @@ async function getCompletedBooks(userId: string) {
 }
 
 async function importData(parsedData: NotionParsedData) {
-    const { authors, books, bookSeries, bookEditions, readings } = parsedData
+    const { authors, books, bookSeries, bookEditions, readings, yearReadingsOrders } = parsedData
 
     const convertedAuthors = Object.values(authors).map((author) => ({
         ...author,
@@ -151,6 +196,13 @@ async function importData(parsedData: NotionParsedData) {
         userId: new ObjectId(reading.userId)
     }))
 
+    const convertedYearReadingsOrders = yearReadingsOrders.map((order) => ({
+        ...order,
+        _id: new ObjectId(order._id),
+        userId: new ObjectId(order.userId),
+        orderedReadingIds: order.orderedReadingIds.map((id) => new ObjectId(id))
+    }))
+
     if (convertedAuthors.length > 0) {
         await db.collection(entities.AUTHORS).insertMany(convertedAuthors as any)
     }
@@ -165,6 +217,9 @@ async function importData(parsedData: NotionParsedData) {
     }
     if (convertedReadings.length > 0) {
         await db.collection(entities.READINGS).insertMany(convertedReadings as any)
+    }
+    if (convertedYearReadingsOrders.length > 0) {
+        await db.collection('yearReadingsOrders').insertMany(convertedYearReadingsOrders as any)
     }
 }
 
