@@ -41,7 +41,7 @@ async function getCompletedBooks(userId: string) {
         { $match: query },
         {
             $lookup: {
-                from: 'books',
+                from: entities.BOOKS,
                 localField: 'bookId',
                 foreignField: '_id',
                 as: 'book'
@@ -50,7 +50,7 @@ async function getCompletedBooks(userId: string) {
         { $unwind: '$book' },
         {
             $lookup: {
-                from: 'authors',
+                from: entities.AUTHORS,
                 localField: 'book.authorIds',
                 foreignField: '_id',
                 as: 'authors'
@@ -58,7 +58,7 @@ async function getCompletedBooks(userId: string) {
         },
         {
             $lookup: {
-                from: 'bookeditions',
+                from: entities.BOOK_EDITIONS,
                 localField: 'bookEditionId',
                 foreignField: '_id',
                 as: 'edition'
@@ -84,7 +84,7 @@ async function getCompletedBooks(userId: string) {
         }
     ]
 
-    return db.collection<IReadingBackend>('readings').aggregate(pipeline).toArray()
+    return db.collection<IReadingBackend>(entities.READINGS).aggregate(pipeline).toArray()
 }
 
 async function importData(parsedData: NotionParsedData) {

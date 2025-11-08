@@ -62,7 +62,7 @@ export const entities = {
     AUTHORS: 'authors' as Collection,
     GENRES: 'genres' as Collection,
     BOOK_SERIES: 'bookSeries' as Collection,
-    BOOK_EDITIONS: 'editions' as Collection,
+    BOOK_EDITIONS: 'bookEditions' as Collection,
     READINGS: 'readings' as Collection,
     READERS: 'readers' as Collection,
     REVIEWS: 'reviews' as Collection,

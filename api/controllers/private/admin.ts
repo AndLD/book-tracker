@@ -6,7 +6,7 @@ import { AuthorizedRequest } from '../../utils/types'
 
 async function deleteAllDocs(req: AuthorizedRequest, res: Response) {
     await booksService.deleteAllDocs()
-    apiUtils.sendResult(res)
+    res.sendStatus(200)
 }
 
 export const adminControllers = {
