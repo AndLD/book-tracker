@@ -313,7 +313,8 @@ async function parsePage(pageId: string, userId: string): Promise<NotionParsedDa
 
         for (const yearToggle of yearToggles) {
             const yearTitle = yearToggle.value.properties?.title?.flat(Infinity).join('') || ''
-            const year = /\d{4}/.test(yearTitle) ? parseInt(yearTitle) : undefined
+            const yearMatch = yearTitle.match(/\d{4}/)
+            const year = yearMatch ? parseInt(yearMatch[0]) : undefined
 
             const bookEntries = yearToggle.value.content?.map(getBlock).filter((block): block is NotionBlock => !!block)
 
