@@ -70,11 +70,13 @@ function parseTitle(titleArray: any[][]): {
     url?: string
     isSeriesHighlighted: boolean
     isTitleHighlighted: boolean
+    isDropped: boolean
 } {
     let text = ''
     let url: string | undefined
     let isSeriesHighlighted = false
     let isTitleHighlighted = false
+    let isDropped = false
 
     const fullText = titleArray.map((segment) => segment[0]).join('')
     const seriesSeparatorIndex = fullText.indexOf('//')
@@ -94,13 +96,16 @@ function parseTitle(titleArray: any[][]): {
                         isTitleHighlighted = true
                     }
                 }
+                if (format[0] === 's') {
+                    isDropped = true
+                }
             }
         }
         accumulatedLength += segmentText.length
         text += segmentText
     }
 
-    return { text, url, isSeriesHighlighted, isTitleHighlighted }
+    return { text, url, isSeriesHighlighted, isTitleHighlighted, isDropped }
 }
 
 function parseBookEntry(
@@ -110,9 +115,9 @@ function parseBookEntry(
     userId: string,
     year?: number
 ) {
-    const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted } = parseTitle(titleArray)
+    const { text: title, url: websiteUrl, isSeriesHighlighted, isTitleHighlighted, isDropped } = parseTitle(titleArray)
     const regex =
-        /^(?:(.+?)\s*\/\/\s*)?(.+)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\((.*)\))?$/
+        /^(?:(.+?)\s*\/\/\s*)?(.+?)(?:\s*\([рp]\))?(?:\s*\((\d{4})\))?\s*-\s*(.+?)(?=\s+(?:~?\s*(?:\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2}\.\d{1,2}\.\d{4}-\d{1,2}\.\d{1,2}\.\d{4}|X|x|Х|х))|\s*\(|$)(?:\s+([^(\n]+))?(?:\s*\((\d+(?:\.\d+)?)\)ч)?(?:\s*\{(.*)\})?$/
     const match = title.match(regex)
 
     if (!match) {
@@ -120,11 +125,6 @@ function parseBookEntry(
     }
 
     let [, seriesTitle, bookTitle, publishYear, authorName, dates, duration, comment] = match
-
-    const isDropped = title.includes('[[')
-    if (isDropped) {
-        bookTitle = bookTitle.replace('[[s]]', '')
-    }
 
     const authorNames = authorName.split(', ').map((name) => name.trim())
     const authorIds = authorNames.map((name) => {
@@ -258,7 +258,7 @@ function parseBookEntry(
             bookId,
             bookEditionId: editionId,
             userId,
-            status: isDropped ? 'READING' : 'COMPLETED',
+            status: isDropped ? 'DROPPED' : 'COMPLETED',
             createdAt: block.value.created_time,
             year,
             comment: comment ? comment.trim() : undefined

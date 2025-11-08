@@ -36,7 +36,7 @@ async function getBooks(userId?: string): Promise<IBookBackend[]> {
 }
 
 async function getCompletedBooks(userId: string) {
-    const query = { userId: new ObjectId(userId), status: 'COMPLETED' }
+    const query = { userId: new ObjectId(userId), status: { $in: ['COMPLETED', 'DROPPED'] } }
     const pipeline = [
         { $match: query },
         {
